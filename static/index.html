@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apex | Multi-Agent Deep Research & AI Chat</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: {
+                            900: '#090d16',
+                            800: '#0f172a',
+                            700: '#1e293b',
+                            600: '#334155',
+                        },
+                        brand: {
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Marked.js for Markdown -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="bg-[#090d16] text-slate-100 min-h-screen flex flex-col antialiased selection:bg-blue-600 selection:text-white">
+
+    <!-- =================================================================== -->
+    <!-- AUTHENTICATION VIEW (LOGIN & SIGNUP) -->
+    <!-- =================================================================== -->
+    <div id="view-auth" class="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-950/40 via-[#090d16] to-[#090d16]">
+        <!-- Decorative Glow Orbs -->
+        <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="w-full max-w-md glass-panel p-8 rounded-2xl shadow-2xl relative z-10 border border-slate-800">
+            <!-- App Brand -->
+            <div class="flex items-center justify-center gap-3 mb-6">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/25">
+                    <i data-lucide="sparkles" class="w-6 h-6 text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">Apex Research</h1>
+                    <p class="text-xs text-blue-400 font-medium tracking-wide uppercase">Multi-Agent Intelligence</p>
+                </div>
+            </div>
+
+            <!-- Auth Error / Success Alert -->
+            <div id="auth-alert" class="hidden mb-4 p-3 rounded-xl text-sm border"></div>
+
+            <!-- Form Tabs -->
+            <div class="flex bg-slate-900/80 p-1 rounded-xl mb-6 border border-slate-800">
+                <button id="tab-login" onclick="switchAuthTab('login')" class="flex-1 py-2 text-sm font-semibold rounded-lg bg-blue-600 text-white transition-all shadow-md">Sign In</button>
+                <button id="tab-register" onclick="switchAuthTab('register')" class="flex-1 py-2 text-sm font-semibold rounded-lg text-slate-400 hover:text-white transition-all">Create Account</button>
+            </div>
+
+            <!-- LOGIN FORM -->
+            <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Email Address</label>
+                    <div class="relative">
+                        <i data-lucide="mail" class="w-4 h-4 text-slate-500 absolute left-3.5 top-3.5"></i>
+                        <input type="email" id="login-email" required class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" placeholder="name@domain.com">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Password</label>
+                    <div class="relative">
+                        <i data-lucide="lock" class="w-4 h-4 text-slate-500 absolute left-3.5 top-3.5"></i>
+                        <input type="password" id="login-password" required class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" placeholder="••••••••">
+                    </div>
+                </div>
+                <button type="submit" id="btn-login-submit" class="w-full py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm transition shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2">
+                    <span>Sign In</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </button>
+            </form>
+
+            <!-- REGISTER FORM -->
+            <form id="form-register" onsubmit="handleRegister(event)" class="space-y-4 hidden">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Full Name</label>
+                    <div class="relative">
+                        <i data-lucide="user" class="w-4 h-4 text-slate-500 absolute left-3.5 top-3.5"></i>
+                        <input type="text" id="reg-name" required class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" placeholder="Dr. Alan Turing">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Email Address</label>
+                    <div class="relative">
+                        <i data-lucide="mail" class="w-4 h-4 text-slate-500 absolute left-3.5 top-3.5"></i>
+                        <input type="email" id="reg-email" required class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" placeholder="name@domain.com">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Password (min 6 chars)</label>
+                    <div class="relative">
+                        <i data-lucide="lock" class="w-4 h-4 text-slate-500 absolute left-3.5 top-3.5"></i>
+                        <input type="password" id="reg-password" minlength="6" required class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" placeholder="••••••••">
+                    </div>
+                </div>
+                <button type="submit" id="btn-register-submit" class="w-full py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm transition shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2">
+                    <span>Create Free Account</span>
+                    <i data-lucide="user-plus" class="w-4 h-4"></i>
+                </button>
+            </form>
+
+            <!-- Quick Demo Button -->
+            <div class="mt-6 pt-5 border-t border-slate-800 text-center">
+                <button onclick="fillDemoAccount()" type="button" class="text-xs text-slate-400 hover:text-blue-400 transition flex items-center justify-center gap-1.5 mx-auto">
+                    <i data-lucide="play-circle" class="w-4 h-4 text-blue-400"></i>
+                    <span>Use Demo Account (researcher@example.com)</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- =================================================================== -->
+    <!-- MAIN APPLICATION SHELL (AUTHENTICATED) -->
+    <!-- =================================================================== -->
+    <div id="app-shell" class="hidden min-h-screen flex overflow-hidden">
+
+        <!-- SIDEBAR -->
+        <aside class="w-64 bg-slate-900/90 border-r border-slate-800 flex flex-col justify-between flex-shrink-0 z-30 transition-transform duration-300">
+            <div>
+                <!-- Brand Header -->
+                <div class="h-16 px-6 border-b border-slate-800 flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-md shadow-blue-500/20">
+                        <i data-lucide="sparkles" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <div>
+                        <span class="font-bold text-base tracking-tight text-white">Apex Research</span>
+                        <div class="flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                            <span class="text-[10px] text-slate-400 font-medium uppercase tracking-wider">Multi-Agent</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Links -->
+                <nav class="p-3 space-y-1">
+                    <button onclick="switchView('dashboard')" id="nav-dashboard" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition text-blue-400 bg-blue-500/10 border border-blue-500/20">
+                        <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+                        <span>Dashboard</span>
+                    </button>
+
+                    <button onclick="switchView('research')" id="nav-research" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition text-slate-300 hover:text-white hover:bg-slate-800/60">
+                        <i data-lucide="microscope" class="w-4 h-4 text-indigo-400"></i>
+                        <span>Deep Research</span>
+                        <span class="ml-auto text-[10px] px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-semibold">4 AGENTS</span>
+                    </button>
+
+                    <button onclick="switchView('chat')" id="nav-chat" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition text-slate-300 hover:text-white hover:bg-slate-800/60">
+                        <i data-lucide="message-square" class="w-4 h-4 text-emerald-400"></i>
+                        <span>Simple Chat</span>
+                    </button>
+
+                    <button onclick="switchView('history')" id="nav-history" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition text-slate-300 hover:text-white hover:bg-slate-800/60">
+                        <i data-lucide="clock" class="w-4 h-4 text-amber-400"></i>
+                        <span>History</span>
+                        <span id="nav-history-badge" class="ml-auto text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 font-semibold">0</span>
+                    </button>
+
+                    <button onclick="switchView('profile')" id="nav-profile" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition text-slate-300 hover:text-white hover:bg-slate-800/60">
+                        <i data-lucide="user-check" class="w-4 h-4 text-sky-400"></i>
+                        <span>Profile & Keys</span>
+                    </button>
+                </nav>
+            </div>
+
+            <!-- User Footer & Logout -->
+            <div class="p-3 border-t border-slate-800">
+                <div class="flex items-center gap-3 p-2 rounded-xl bg-slate-950/60 border border-slate-800/80 mb-2">
+                    <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center font-bold text-white text-sm">
+                        <span id="user-avatar-initials">U</span>
+                    </div>
+                    <div class="overflow-hidden flex-1">
+                        <p id="user-display-name" class="text-xs font-semibold text-white truncate">User Name</p>
+                        <p id="user-display-email" class="text-[11px] text-slate-400 truncate">user@email.com</p>
+                    </div>
+                </div>
+
+                <button onclick="logout()" class="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-medium text-red-400 hover:bg-red-500/10 transition border border-transparent hover:border-red-500/20">
+                    <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+                    <span>Log Out</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- MAIN VIEW CONTAINER -->
+        <main class="flex-1 flex flex-col h-screen overflow-y-auto bg-[#090d16]">
+
+            <!-- TOP STATUS BAR -->
+            <header class="h-16 border-b border-slate-800/80 px-8 flex items-center justify-between bg-slate-900/40 backdrop-blur sticky top-0 z-20">
+                <div class="flex items-center gap-3">
+                    <h2 id="view-title" class="text-lg font-bold text-white">Dashboard Overview</h2>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div id="api-status-indicator" class="flex items-center gap-2 px-3 py-1 rounded-full text-xs bg-slate-800 border border-slate-700 text-slate-300">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                        <span id="api-status-text">Checking System...</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- VIEW 1: DASHBOARD OVERVIEW -->
+            <div id="view-dashboard-content" class="p-8 space-y-8 animate-fade-in">
+                <!-- Welcome Banner -->
+                <div class="glass-card p-6 rounded-2xl relative overflow-hidden border border-slate-800">
+                    <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-blue-600/10 rounded-full blur-2xl"></div>
+                    <div class="max-w-2xl">
+                        <span class="text-xs font-semibold text-blue-400 uppercase tracking-wider">Multi-Agent Deep Research System</span>
+                        <h3 class="text-2xl font-bold text-white mt-1">Welcome back, <span id="dash-welcome-name">Researcher</span>!</h3>
+                        <p class="text-sm text-slate-400 mt-2 leading-relaxed">
+                            Apex combines 4 autonomous agents: <strong class="text-slate-200">Search Agent (Tavily)</strong>, <strong class="text-slate-200">Reader/Scraper Agent</strong>, <strong class="text-slate-200">Research Writer</strong>, and <strong class="text-slate-200">Quality Critic</strong> to generate comprehensive, cited, scored research reports.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 4 Metrics Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+                    <div class="glass-card p-5 rounded-xl border border-slate-800 flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center">
+                            <i data-lucide="microscope" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Deep Researches</p>
+                            <h4 id="stat-researches" class="text-2xl font-bold text-white mt-0.5">0</h4>
+                        </div>
+                    </div>
+
+                    <div class="glass-card p-5 rounded-xl border border-slate-800 flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
+                            <i data-lucide="message-square" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Chat Messages</p>
+                            <h4 id="stat-messages" class="text-2xl font-bold text-white mt-0.5">0</h4>
+                        </div>
+                    </div>
+
+                    <div class="glass-card p-5 rounded-xl border border-slate-800 flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center">
+                            <i data-lucide="award" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Avg Critic Score</p>
+                            <h4 id="stat-critic" class="text-2xl font-bold text-amber-300 mt-0.5">8.5/10</h4>
+                        </div>
+                    </div>
+
+                    <div class="glass-card p-5 rounded-xl border border-slate-800 flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center">
+                            <i data-lucide="cpu" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Active Pipeline</p>
+                            <h4 class="text-lg font-bold text-white mt-0.5">LangChain 4-Step</h4>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div onclick="switchView('research')" class="glass-card p-6 rounded-2xl border border-blue-500/30 hover:border-blue-500/60 cursor-pointer group transition">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-10 h-10 rounded-lg bg-blue-600/20 text-blue-400 flex items-center justify-center">
+                                <i data-lucide="search" class="w-5 h-5"></i>
+                            </div>
+                            <span class="text-xs font-semibold px-2 py-1 rounded bg-blue-500/10 text-blue-400 flex items-center gap-1">
+                                <span>Multi-Agent</span>
+                                <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i>
+                            </span>
+                        </div>
+                        <h4 class="text-lg font-bold text-white">Start Deep Research</h4>
+                        <p class="text-xs text-slate-400 mt-1.5 leading-relaxed">
+                            Trigger the full multi-agent pipeline: search the web, scrape high-value pages, draft structured findings, and evaluate with our strict critic rubric.
+                        </p>
+                    </div>
+
+                    <div onclick="switchView('chat')" class="glass-card p-6 rounded-2xl border border-emerald-500/30 hover:border-emerald-500/60 cursor-pointer group transition">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-10 h-10 rounded-lg bg-emerald-600/20 text-emerald-400 flex items-center justify-center">
+                                <i data-lucide="message-circle" class="w-5 h-5"></i>
+                            </div>
+                            <span class="text-xs font-semibold px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 flex items-center gap-1">
+                                <span>Standard LLM</span>
+                                <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i>
+                            </span>
+                        </div>
+                        <h4 class="text-lg font-bold text-white">Simple AI Chat</h4>
+                        <p class="text-xs text-slate-400 mt-1.5 leading-relaxed">
+                            Have conversational Q&A with an AI assistant. Instant, flexible, and fully saved per session.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Recent Research Activity -->
+                <div class="glass-card rounded-2xl border border-slate-800 p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="text-base font-bold text-white flex items-center gap-2">
+                            <i data-lucide="clock" class="w-4 h-4 text-blue-400"></i>
+                            <span>Recent Research Reports</span>
+                        </h4>
+                        <button onclick="switchView('history')" class="text-xs text-blue-400 hover:text-blue-300 font-semibold">View All History →</button>
+                    </div>
+
+                    <div id="dash-recent-list" class="space-y-3">
+                        <div class="text-center py-8 text-slate-500 text-sm">Loading recent research...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW 2: DEEP RESEARCH SECTION -->
+            <div id="view-research-content" class="p-8 space-y-8 hidden animate-fade-in">
+                <!-- Research Prompt Card -->
+                <div class="glass-card p-6 rounded-2xl border border-slate-800 relative">
+                    <div class="flex items-center justify-between mb-3">
+                        <div>
+                            <h3 class="text-xl font-bold text-white">Multi-Agent Deep Research Engine</h3>
+                            <p class="text-xs text-slate-400 mt-0.5">Powered by Tavily Search, BeautifulSoup Scraper, and Mistral LangChain Synthesizer & Critic</p>
+                        </div>
+                    </div>
+
+                    <form onsubmit="startDeepResearch(event)" class="mt-4">
+                        <div class="relative">
+                            <input type="text" id="research-topic-input" required minlength="3" class="w-full bg-slate-900 border border-slate-700/80 rounded-2xl pl-12 pr-36 py-4 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition shadow-inner" placeholder="Enter research query, e.g., Quantum Computing breakthroughs 2026...">
+                            <i data-lucide="search" class="w-5 h-5 text-slate-500 absolute left-4 top-4"></i>
+                            
+                            <button type="submit" id="btn-submit-research" class="absolute right-2 top-2 bottom-2 px-5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold rounded-xl flex items-center gap-2 shadow-md shadow-blue-600/30 transition">
+                                <span>Run Research</span>
+                                <i data-lucide="sparkles" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+
+                        <!-- Sample Suggestion Pills -->
+                        <div class="flex flex-wrap items-center gap-2 mt-3 text-xs">
+                            <span class="text-slate-500 font-medium">Try suggestions:</span>
+                            <button type="button" onclick="setResearchQuery('Solid-state batteries commercialization roadmap')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/60 transition">Solid-State Batteries</button>
+                            <button type="button" onclick="setResearchQuery('Generative AI in drug discovery clinical trials')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/60 transition">AI Drug Discovery</button>
+                            <button type="button" onclick="setResearchQuery('Autonomous humanoid robotics supply chain 2026')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/60 transition">Humanoid Robotics</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- LIVE 4-AGENT PIPELINE PROGRESS -->
+                <div id="research-progress-section" class="hidden glass-card p-6 rounded-2xl border border-blue-500/30 space-y-6">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-3 h-3 rounded-full bg-blue-500 animate-ping"></div>
+                            <h4 class="text-base font-bold text-white">Multi-Agent Pipeline Executing</h4>
+                        </div>
+                        <span id="research-timer" class="text-xs font-mono text-slate-400 bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-800">Elapsed: 0s</span>
+                    </div>
+
+                    <!-- 4 Agent Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <!-- Step 1: Search Agent -->
+                        <div id="agent-card-1" class="glass-card p-4 rounded-xl border border-slate-800 transition-all">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-500/20 text-blue-400">AGENT 1</span>
+                                <span id="agent-icon-1"><i data-lucide="circle-dashed" class="w-4 h-4 text-slate-500"></i></span>
+                            </div>
+                            <h5 class="text-sm font-bold text-white">Search Agent</h5>
+                            <p class="text-xs text-slate-400 mt-1">Tavily Web Search</p>
+                            <div id="agent-status-1" class="text-[11px] text-slate-500 mt-3 truncate">Waiting...</div>
+                        </div>
+
+                        <!-- Step 2: Reader Agent -->
+                        <div id="agent-card-2" class="glass-card p-4 rounded-xl border border-slate-800 transition-all">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-400">AGENT 2</span>
+                                <span id="agent-icon-2"><i data-lucide="circle-dashed" class="w-4 h-4 text-slate-500"></i></span>
+                            </div>
+                            <h5 class="text-sm font-bold text-white">Reader Agent</h5>
+                            <p class="text-xs text-slate-400 mt-1">Deep Content Scraper</p>
+                            <div id="agent-status-2" class="text-[11px] text-slate-500 mt-3 truncate">Waiting...</div>
+                        </div>
+
+                        <!-- Step 3: Writer Chain -->
+                        <div id="agent-card-3" class="glass-card p-4 rounded-xl border border-slate-800 transition-all">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-purple-500/20 text-purple-400">AGENT 3</span>
+                                <span id="agent-icon-3"><i data-lucide="circle-dashed" class="w-4 h-4 text-slate-500"></i></span>
+                            </div>
+                            <h5 class="text-sm font-bold text-white">Research Writer</h5>
+                            <p class="text-xs text-slate-400 mt-1">LangChain Synthesizer</p>
+                            <div id="agent-status-3" class="text-[11px] text-slate-500 mt-3 truncate">Waiting...</div>
+                        </div>
+
+                        <!-- Step 4: Critic Chain -->
+                        <div id="agent-card-4" class="glass-card p-4 rounded-xl border border-slate-800 transition-all">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-400">AGENT 4</span>
+                                <span id="agent-icon-4"><i data-lucide="circle-dashed" class="w-4 h-4 text-slate-500"></i></span>
+                            </div>
+                            <h5 class="text-sm font-bold text-white">Quality Critic</h5>
+                            <p class="text-xs text-slate-400 mt-1">Evaluator & Scorer</p>
+                            <div id="agent-status-4" class="text-[11px] text-slate-500 mt-3 truncate">Waiting...</div>
+                        </div>
+                    </div>
+
+                    <!-- Live Log Drawer -->
+                    <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 font-mono text-xs text-slate-400 space-y-1 max-h-32 overflow-y-auto" id="pipeline-live-logs">
+                        <div>> Initializing multi-agent research pipeline...</div>
+                    </div>
+                </div>
+
+                <!-- STRUCTURED RESEARCH REPORT VIEWER -->
+                <div id="research-result-section" class="hidden space-y-6">
+                    <!-- Report Header -->
+                    <div class="glass-card p-6 rounded-2xl border border-slate-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                        <div>
+                            <span class="text-xs font-semibold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                                <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
+                                <span>Report Finalized & Saved to History</span>
+                            </span>
+                            <h3 id="report-topic-title" class="text-2xl font-bold text-white mt-1">Topic Title</h3>
+                            <p id="report-timestamp" class="text-xs text-slate-400 mt-0.5">Generated just now</p>
+                        </div>
+
+                        <!-- Critic Score Gauge -->
+                        <div class="flex items-center gap-3">
+                            <div class="score-badge-gold px-4 py-2.5 rounded-xl flex items-center gap-3">
+                                <i data-lucide="award" class="w-6 h-6 text-amber-400"></i>
+                                <div>
+                                    <div class="text-[10px] text-amber-300 font-semibold uppercase tracking-wider">Critic Score</div>
+                                    <div id="report-critic-score" class="text-xl font-extrabold text-amber-200">8.5/10</div>
+                                </div>
+                            </div>
+
+                            <button onclick="copyReportMarkdown()" class="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition" title="Copy Markdown">
+                                <i data-lucide="copy" class="w-4 h-4"></i>
+                            </button>
+                            <button onclick="window.print()" class="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition" title="Print / PDF">
+                                <i data-lucide="printer" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Report Content Tabs -->
+                    <div class="flex bg-slate-900/90 p-1.5 rounded-xl border border-slate-800">
+                        <button onclick="switchReportTab('full')" id="tab-report-full" class="px-4 py-2 text-xs font-semibold rounded-lg bg-blue-600 text-white transition">Full Structured Report</button>
+                        <button onclick="switchReportTab('critic')" id="tab-report-critic" class="px-4 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition">Critic Rubric & Verdict</button>
+                        <button onclick="switchReportTab('sources')" id="tab-report-sources" class="px-4 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition">Raw Agent Data</button>
+                    </div>
+
+                    <!-- TAB 1: FULL MARKDOWN REPORT -->
+                    <div id="report-tab-full-content" class="glass-card p-8 rounded-2xl border border-slate-800">
+                        <div id="report-rendered-markdown" class="prose-custom max-w-none"></div>
+                    </div>
+
+                    <!-- TAB 2: CRITIC EVALUATION -->
+                    <div id="report-tab-critic-content" class="hidden glass-card p-8 rounded-2xl border border-slate-800 space-y-6">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center font-bold">
+                                <i data-lucide="shield-check" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-bold text-white">Quality Critic Assessment</h4>
+                                <p class="text-xs text-slate-400">Strict automated rubric evaluating factual rigor, structure, and insights</p>
+                            </div>
+                        </div>
+
+                        <div id="critic-rendered-feedback" class="bg-slate-950/80 p-6 rounded-xl border border-slate-800 whitespace-pre-wrap font-mono text-xs text-slate-300 leading-relaxed"></div>
+                    </div>
+
+                    <!-- TAB 3: SOURCES & RAW DATA -->
+                    <div id="report-tab-sources-content" class="hidden space-y-6">
+                        <div class="glass-card p-6 rounded-2xl border border-slate-800">
+                            <h4 class="text-base font-bold text-white mb-2 flex items-center gap-2">
+                                <i data-lucide="search" class="w-4 h-4 text-blue-400"></i>
+                                <span>Agent 1: Raw Tavily Search Findings</span>
+                            </h4>
+                            <div id="raw-search-results" class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-xs font-mono text-slate-400 whitespace-pre-wrap max-h-60 overflow-y-auto"></div>
+                        </div>
+
+                        <div class="glass-card p-6 rounded-2xl border border-slate-800">
+                            <h4 class="text-base font-bold text-white mb-2 flex items-center gap-2">
+                                <i data-lucide="file-text" class="w-4 h-4 text-indigo-400"></i>
+                                <span>Agent 2: Scraped Source Content Excerpts</span>
+                            </h4>
+                            <div id="raw-scraped-content" class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-xs font-mono text-slate-400 whitespace-pre-wrap max-h-60 overflow-y-auto"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW 3: SIMPLE CHAT SECTION -->
+            <div id="view-chat-content" class="flex-1 flex overflow-hidden hidden animate-fade-in">
+                <!-- Chat Sessions Sidebar -->
+                <div class="w-72 bg-slate-900/60 border-r border-slate-800 flex flex-col justify-between flex-shrink-0">
+                    <div class="p-3 border-b border-slate-800 flex items-center justify-between">
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Conversations</span>
+                        <button onclick="createNewConversation()" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium transition shadow">
+                            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                            <span>New Chat</span>
+                        </button>
+                    </div>
+
+                    <!-- Conversations List -->
+                    <div id="chat-conv-list" class="flex-1 overflow-y-auto p-2 space-y-1">
+                        <div class="text-center py-6 text-slate-500 text-xs">No conversations yet</div>
+                    </div>
+                </div>
+
+                <!-- Chat Canvas Window -->
+                <div class="flex-1 flex flex-col h-full bg-[#090d16] relative">
+                    <!-- Conversation Header -->
+                    <div class="h-14 border-b border-slate-800 px-6 flex items-center justify-between bg-slate-900/30">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-2.5 h-2.5 rounded-full bg-emerald-400"></div>
+                            <span id="chat-active-title" class="text-sm font-semibold text-white">Select or create a chat</span>
+                        </div>
+                        <button onclick="deleteActiveConversation()" id="btn-delete-conv" class="hidden text-xs text-red-400 hover:text-red-300 flex items-center gap-1">
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                            <span>Delete</span>
+                        </button>
+                    </div>
+
+                    <!-- Messages Stream Canvas -->
+                    <div id="chat-messages-container" class="flex-1 overflow-y-auto p-6 space-y-4">
+                        <div class="max-w-md mx-auto text-center py-16 space-y-3">
+                            <div class="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center mx-auto text-slate-400">
+                                <i data-lucide="message-square" class="w-6 h-6"></i>
+                            </div>
+                            <h4 class="text-base font-bold text-white">Simple AI Chat</h4>
+                            <p class="text-xs text-slate-400">Ask questions, brainstorm topics, or summarize ideas. Conversations are preserved automatically in your account.</p>
+                        </div>
+                    </div>
+
+                    <!-- Chat Typing Indicator -->
+                    <div id="chat-typing-indicator" class="hidden px-6 py-2 text-xs text-blue-400 flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+                        <span>AI Assistant is generating response...</span>
+                    </div>
+
+                    <!-- Chat Message Input Box -->
+                    <div class="p-4 border-t border-slate-800 bg-slate-900/40">
+                        <form onsubmit="handleSendChatMessage(event)" class="max-w-4xl mx-auto flex items-end gap-2">
+                            <textarea id="chat-input" rows="1" onkeydown="handleChatKeyDown(event)" placeholder="Message AI assistant... (Press Enter to send, Shift+Enter for newline)" class="flex-1 bg-slate-900 border border-slate-700/80 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none transition"></textarea>
+                            <button type="submit" id="btn-chat-send" class="p-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl shadow-md transition flex-shrink-0">
+                                <i data-lucide="send" class="w-4 h-4"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW 4: HISTORY SECTION -->
+            <div id="view-history-content" class="p-8 space-y-6 hidden animate-fade-in">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <h3 class="text-xl font-bold text-white">Your Research & Chat History</h3>
+                        <p class="text-xs text-slate-400 mt-0.5">Access and review all previous research reports and conversational chat sessions</p>
+                    </div>
+
+                    <!-- Tab Switcher -->
+                    <div class="flex bg-slate-900 p-1 rounded-xl border border-slate-800">
+                        <button onclick="switchHistoryTab('research')" id="tab-hist-research" class="px-4 py-1.5 text-xs font-semibold rounded-lg bg-blue-600 text-white transition">Deep Research</button>
+                        <button onclick="switchHistoryTab('chat')" id="tab-hist-chat" class="px-4 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition">Chat Sessions</button>
+                    </div>
+                </div>
+
+                <!-- Search Input -->
+                <div class="relative max-w-md">
+                    <i data-lucide="search" class="w-4 h-4 text-slate-500 absolute left-3.5 top-3.5"></i>
+                    <input type="text" id="history-search-input" oninput="filterHistory()" placeholder="Search previous topics or conversations..." class="w-full bg-slate-900 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-blue-500">
+                </div>
+
+                <!-- RESEARCH HISTORY LIST -->
+                <div id="hist-research-container" class="space-y-3">
+                    <div class="text-center py-12 text-slate-500 text-sm">Loading research history...</div>
+                </div>
+
+                <!-- CHAT HISTORY LIST -->
+                <div id="hist-chat-container" class="hidden space-y-3">
+                    <div class="text-center py-12 text-slate-500 text-sm">Loading chat history...</div>
+                </div>
+            </div>
+
+            <!-- VIEW 5: PROFILE & SYSTEM KEYS -->
+            <div id="view-profile-content" class="p-8 space-y-8 hidden animate-fade-in">
+                <div class="glass-card p-6 rounded-2xl border border-slate-800">
+                    <div class="flex items-center gap-4">
+                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+                            <span id="prof-avatar-initials">U</span>
+                        </div>
+                        <div>
+                            <h3 id="prof-full-name" class="text-xl font-bold text-white">Researcher Name</h3>
+                            <p id="prof-email" class="text-xs text-slate-400">researcher@example.com</p>
+                            <span class="inline-block mt-2 text-[10px] font-semibold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400">Authenticated Session</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System & API Keys Checklist -->
+                <div class="glass-card p-6 rounded-2xl border border-slate-800 space-y-4">
+                    <h4 class="text-base font-bold text-white flex items-center gap-2">
+                        <i data-lucide="key" class="w-4 h-4 text-blue-400"></i>
+                        <span>System Environment & API Configuration</span>
+                    </h4>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        API keys are securely loaded from the root <code class="text-blue-400">.env</code> file and never exposed to the frontend browser.
+                    </p>
+
+                    <div class="space-y-3 pt-2">
+                        <div class="flex items-center justify-between p-3.5 rounded-xl bg-slate-950/70 border border-slate-800">
+                            <div class="flex items-center gap-3">
+                                <i data-lucide="brain" class="w-5 h-5 text-indigo-400"></i>
+                                <div>
+                                    <div class="text-xs font-semibold text-white">Mistral AI (<code class="text-indigo-300">MISTRAL_API_KEY</code>)</div>
+                                    <div class="text-[11px] text-slate-500">Powers Research Writer, Quality Critic, and Simple Chat</div>
+                                </div>
+                            </div>
+                            <span id="cfg-badge-mistral" class="text-xs font-medium px-2.5 py-1 rounded-lg bg-slate-800 text-slate-400">Checking...</span>
+                        </div>
+
+                        <div class="flex items-center justify-between p-3.5 rounded-xl bg-slate-950/70 border border-slate-800">
+                            <div class="flex items-center gap-3">
+                                <i data-lucide="globe" class="w-5 h-5 text-emerald-400"></i>
+                                <div>
+                                    <div class="text-xs font-semibold text-white">Tavily Search (<code class="text-emerald-300">TAVILY_API_KEY</code>)</div>
+                                    <div class="text-[11px] text-slate-500">Powers Agent 1 Live Web Search and source ranking</div>
+                                </div>
+                            </div>
+                            <span id="cfg-badge-tavily" class="text-xs font-medium px-2.5 py-1 rounded-lg bg-slate-800 text-slate-400">Checking...</span>
+                        </div>
+
+                        <div class="flex items-center justify-between p-3.5 rounded-xl bg-slate-950/70 border border-slate-800">
+                            <div class="flex items-center gap-3">
+                                <i data-lucide="database" class="w-5 h-5 text-purple-400"></i>
+                                <div>
+                                    <div class="text-xs font-semibold text-white">Relational Database (SQLite)</div>
+                                    <div class="text-[11px] text-slate-500">Stores Users, Passwords (Bcrypt), Research Reports, and Chat Threads</div>
+                                </div>
+                            </div>
+                            <span class="text-xs font-medium px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-400">Connected (deep_research.db)</span>
+                        </div>
+                    </div>
+
+                    <!-- How to configure keys callout -->
+                    <div class="p-4 rounded-xl bg-blue-950/30 border border-blue-800/40 text-xs text-blue-200 space-y-1.5 mt-4">
+                        <p class="font-semibold flex items-center gap-1.5 text-blue-300">
+                            <i data-lucide="info" class="w-4 h-4"></i>
+                            <span>How to update your API keys:</span>
+                        </p>
+                        <p class="text-slate-300">
+                            Open the <code class="text-white bg-slate-900 px-1 py-0.5 rounded">.env</code> file in the project folder and paste your keys:
+                        </p>
+                        <pre class="bg-slate-950 p-2.5 rounded text-blue-300 font-mono text-[11px]">MISTRAL_API_KEY="your_mistral_api_key_here"
+TAVILY_API_KEY="tvly-your_tavily_api_key_here"</pre>
+                        <p class="text-[11px] text-slate-400">Restart the backend after saving to reload new environment variables.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL: PREVIOUS REPORT DETAILS -->
+    <div id="modal-report" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
+        <div class="glass-panel w-full max-w-4xl max-h-[90vh] rounded-2xl border border-slate-800 flex flex-col overflow-hidden shadow-2xl">
+            <div class="h-16 px-6 border-b border-slate-800 flex items-center justify-between bg-slate-900/60">
+                <div class="flex items-center gap-3">
+                    <div class="score-badge-gold px-3 py-1 rounded-lg text-xs font-bold text-amber-300" id="modal-critic-score">8.5/10</div>
+                    <h3 id="modal-report-title" class="text-base font-bold text-white truncate max-w-lg">Report Details</h3>
+                </div>
+                <button onclick="closeReportModal()" class="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-8 space-y-6">
+                <div id="modal-report-markdown" class="prose-custom"></div>
+                <div class="pt-6 border-t border-slate-800">
+                    <h5 class="text-sm font-bold text-amber-300 mb-2">Critic Evaluation</h5>
+                    <pre id="modal-critic-feedback" class="bg-slate-950 p-4 rounded-xl text-xs font-mono text-slate-300 whitespace-pre-wrap"></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom App JavaScript -->
+    <script src="/static/js/app.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
