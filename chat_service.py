@@ -23,7 +23,7 @@ def get_simple_chat_response(messages_history: list) -> str:
         return (
             f"Hello! I am your AI Chat Assistant.\n\n"
             f"I received your message:\n> *\"{latest_prompt}\"*\n\n"
-            f"Currently, `MISTRAL_API_KEY` is not set in `.env`. Once you add your Mistral API key, "
+            f"Currently, the `MISTRAL_API_KEY` environment variable is not available to the server. Once you configure your Mistral API key, "
             f"I will connect live to Mistral AI to answer all your questions dynamically!\n\n"
             f"In the meantime, feel free to explore the **Deep Research** pipeline, check **History**, or create new chat sessions."
         )
@@ -36,6 +36,6 @@ def get_simple_chat_response(messages_history: list) -> str:
         return (
             f"I encountered a notice when connecting to Mistral AI ({str(e)}).\n\n"
             f"Regarding your question about **{latest_prompt}**:\n"
-            f"- Please ensure your `MISTRAL_API_KEY` in `.env` is valid and has active quota.\n"
+            f"- Please ensure the `MISTRAL_API_KEY` environment variable is valid and has active quota.\n"
             f"- You can continue testing chat sessions and multi-agent research freely!"
         )

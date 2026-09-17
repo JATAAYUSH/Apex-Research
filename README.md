@@ -52,6 +52,11 @@ python main.py
 
 Open **http://127.0.0.1:8000** in your browser.
 
+For deployment platforms that provide a `PORT` environment variable, use:
+```bash
+uvicorn main:app --host 0.0.0.0 --port $PORT
+```
+
 ## API Keys
 
 | Key | Where to get |

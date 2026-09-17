@@ -451,7 +451,10 @@ def get_system_status():
 
 if __name__ == "__main__":
     import uvicorn
+    host = os.getenv("HOST", "0.0.0.0")
+    port = int(os.getenv("PORT", "8000"))
+    reload = os.getenv("RELOAD", "false").lower() == "true"
     print("\n" + "=" * 60)
-    print("  Deep Research AI Application Starting on http://127.0.0.1:8000")
+    print(f"  Deep Research AI Application Starting on {host}:{port}")
     print("=" * 60 + "\n")
-    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
+    uvicorn.run("main:app", host=host, port=port, reload=reload)

@@ -87,7 +87,7 @@ def run_research_pipeline(topic: str, step_callback=None) -> dict:
         notify(2, "Reader Agent", "Parsing source documentation and extracting deep excerpts...", "running")
         notify(3, "Research Writer", "Synthesizing comprehensive report across 4 structured sections...", "running")
         notify(4, "Critic Agent", "Performing strict rubric evaluation and scoring...", "running")
-        state = generate_fallback_research(topic, error_reason="MISTRAL_API_KEY is not configured in .env. Showing high-fidelity research sample.")
+        state = generate_fallback_research(topic, error_reason="MISTRAL_API_KEY is not available to the server. Showing high-fidelity research sample.")
         notify(5, "Complete", "Research report and critique generated successfully!", "completed")
         return state
 
